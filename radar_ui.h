@@ -28,12 +28,13 @@ struct Target {
 };
 
 struct Status {
-  bool     senderAlive;  // packets seen within the last 3 s
-  bool     simMode;      // synthetic targets (no sender yet)
+  bool     senderAlive;   // packets seen within the last 3 s
+  bool     simMode;       // synthetic targets (no sender yet)
   bool     muted;
   uint32_t frameCount;
-  int      targetCount;  // valid && !stale
-  char     apInfo[24];   // e.g. "AP: RadarNet"
+  int      targetCount;   // valid && !stale
+  int      senderBatPct;  // sender battery 0..100, -1 = unknown/stock sender
+  char     apInfo[24];    // e.g. "AP: RadarNet"
 };
 
 // Range scale + projection (verbatim math from the upstream sketch).

@@ -26,11 +26,12 @@ int main(int argc, char** argv) {
   bool stale[ui::kMaxTargets] = {false, false, false};
 
   ui::Status st;
-  st.senderAlive = false;
-  st.simMode     = true;
-  st.muted       = false;
-  st.frameCount  = 1234;
-  st.targetCount = 3;
+  st.senderAlive  = false;
+  st.simMode      = true;
+  st.muted        = false;
+  st.frameCount   = 1234;
+  st.targetCount  = 3;
+  st.senderBatPct = 87;
   snprintf(st.apInfo, sizeof(st.apInfo), "AP: RadarNet");
 
   gfx::Canvas fbc{fb, ui::kScreenW, ui::kScreenH};

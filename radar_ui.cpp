@@ -199,6 +199,10 @@ void composeFrame(const gfx::Canvas& fb, const uint16_t* bg,
   y += kLineH;
   if (st.simMode) {
     gfx::drawTextAA(fb, kPanTx, y, "SIM MODE", kFontSmallBold, C_AMBER);
+  } else if (st.senderAlive && st.senderBatPct >= 0) {
+    snprintf(line, sizeof(line), "RX OK  bat %d%%", st.senderBatPct);
+    uint16_t col = st.senderBatPct <= 15 ? C_RED : (st.senderBatPct <= 35 ? C_AMBER : C_GREEN);
+    gfx::drawTextAA(fb, kPanTx, y, line, kFontSmallBold, col);
   } else {
     snprintf(line, sizeof(line), "%s fr:%lu", st.senderAlive ? "RX OK" : "RX ---",
              (unsigned long)st.frameCount);

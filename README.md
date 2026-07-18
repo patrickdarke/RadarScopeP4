@@ -6,12 +6,41 @@ Arduino GIGA receiver to the **ELECROW CrowPanel Advance 5.0" ESP32-P4**
 
 ![RadarScope P4 — host-rendered preview in SIM MODE](docs/preview.png)
 
-The stock radar node is unchanged: a XIAO ESP32-S3 + Ai-Thinker RD-03D 24 GHz
-radar running the upstream
-[`rd03d_xiao_s3_transmitter`](https://github.com/Stevee87/Arduino-ESP32-Radarproject/tree/main/Firmware)
-sketch. It joins the `RadarNet` AP this unit hosts and
-streams UDP packets to port 4210; this display draws up to 3 tracked targets
-on a 120°/8 m scope with distance-reactive sonar pings on the onboard speaker.
+The radar node is a XIAO ESP32-S3 + Ai-Thinker RD-03D 24 GHz radar. It joins
+the `RadarNet` AP this unit hosts and streams UDP packets to port 4210; this
+display draws up to 3 tracked targets on a 120°/8 m scope with
+distance-reactive sonar pings on the onboard speaker.
+
+Two sender options, both compatible:
+- **`sender/` in this repo (recommended)** — simplified untethered build:
+  LiPo straight to the XIAO's built-in charger (no TP4056, no boost, no
+  indicator module), battery telemetry in the packet (shown as `bat %` on the
+  display), Wi-Fi modem sleep, 5 Hz send rate. Wiring: see below.
+- The stock upstream
+  [`rd03d_xiao_s3_transmitter`](https://github.com/Stevee87/Arduino-ESP32-Radarproject/tree/main/Firmware)
+  sketch — works unmodified (no battery readout).
+
+## Sender wiring
+
+![Sender wiring diagram](docs/wiring.svg)
+
+Parts: XIAO ESP32-S3, RD-03D, 1S LiPo (protected), slide switch, two 220 k
+resistors. Radar `OT1→D0`, `RX→D1`, `VCC→3V3` (**test 3.3 V first** — if
+tracking is unreliable at range, use an 18650 battery-shield module and feed
+5 V instead), battery to the BAT pads through the switch, and a 220k/220k
+divider from BAT+ to `A2` for the battery readout. Charge via the XIAO's
+USB-C. Build the sender with:
+
+```bash
+arduino-cli compile --fqbn "esp32:esp32:XIAO_ESP32S3" sender
+arduino-cli upload  --fqbn "esp32:esp32:XIAO_ESP32S3" -p /dev/cu.usbmodem* sender
+```
+
+**Packet format:** the first 32 bytes are byte-identical to upstream
+(magic `0xD03DA7A`, frame counter, 3 × {x, y, speed, valid}); this repo's
+sender appends `{batMv:u16, batPct:u8, version:u8}`. Receivers that don't
+know the tail ignore it, and this display falls back gracefully when it's
+absent — so any sender/display pairing works.
 
 ## Status
 

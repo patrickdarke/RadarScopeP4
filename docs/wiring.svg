@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 640" font-family="Menlo, Consolas, monospace">
+  <defs>
+    <style>
+      .board  { fill: #12241a; stroke: #3fae5f; stroke-width: 2; }
+      .mod    { fill: #101d2b; stroke: #4a86c8; stroke-width: 2; }
+      .pwr    { fill: #241410; stroke: #c8703a; stroke-width: 2; }
+      .pin    { fill: #d8b83a; }
+      .pinlbl { fill: #cfe8d8; font-size: 12px; }
+      .pindim { fill: #7a9a86; font-size: 10px; }
+      .title  { fill: #eaf6ee; font-size: 15px; font-weight: bold; }
+      .sub    { fill: #8fb89f; font-size: 11px; }
+      .note   { fill: #d8c27a; font-size: 12px; }
+      .w5v    { stroke: #e05a3a; stroke-width: 2.5; fill: none; }
+      .wgnd   { stroke: #8a8f96; stroke-width: 2.5; fill: none; }
+      .wtx    { stroke: #4ac86e; stroke-width: 2.5; fill: none; }
+      .wrx    { stroke: #4a9ec8; stroke-width: 2.5; fill: none; }
+      .wbat   { stroke: #d8b83a; stroke-width: 2.5; fill: none; }
+      .wsense { stroke: #c86ac8; stroke-width: 2.5; fill: none; }
+      .res    { fill: #1d1d10; stroke: #d8b83a; stroke-width: 1.5; }
+    </style>
+  </defs>
+
+  <rect width="980" height="640" fill="#0a0f0c"/>
+  <text x="24" y="34" class="title" font-size="19">RadarScope sender — untethered node wiring</text>
+  <text x="24" y="54" class="sub">XIAO ESP32-S3 + RD-03D + 1S LiPo (battery straight to the XIAO's own charger — no TP4056, no boost)</text>
+
+  <!-- ═══════════ XIAO ESP32-S3 ═══════════ -->
+  <rect x="400" y="130" width="190" height="290" rx="14" class="board"/>
+  <text x="495" y="157" class="title" text-anchor="middle">XIAO ESP32-S3</text>
+  <text x="495" y="174" class="sub" text-anchor="middle">USB-C on top edge</text>
+  <rect x="467" y="122" width="56" height="14" rx="4" fill="#22303a" stroke="#5a6a76"/>
+
+  <!-- left pins -->
+  <g>
+    <circle cx="400" cy="210" r="5" class="pin"/>
+    <text x="412" y="214" class="pinlbl">D0</text><text x="436" y="214" class="pindim">GPIO1 · UART1 RX</text>
+    <circle cx="400" cy="245" r="5" class="pin"/>
+    <text x="412" y="249" class="pinlbl">D1</text><text x="436" y="249" class="pindim">GPIO2 · UART1 TX</text>
+    <circle cx="400" cy="280" r="5" class="pin"/>
+    <text x="412" y="284" class="pinlbl">A2</text><text x="436" y="284" class="pindim">GPIO3 · bat sense</text>
+    <circle cx="400" cy="315" r="5" class="pin"/><text x="412" y="319" class="pinlbl">D3</text>
+    <circle cx="400" cy="350" r="5" class="pin"/><text x="412" y="354" class="pinlbl">D4</text>
+  </g>
+  <!-- right pins -->
+  <g>
+    <circle cx="590" cy="210" r="5" class="pin"/><text x="578" y="214" class="pinlbl" text-anchor="end">5V</text>
+    <circle cx="590" cy="245" r="5" class="pin"/><text x="578" y="249" class="pinlbl" text-anchor="end">GND</text>
+    <circle cx="590" cy="280" r="5" class="pin"/><text x="578" y="284" class="pinlbl" text-anchor="end">3V3</text>
+  </g>
+  <!-- battery pads underneath -->
+  <rect x="435" y="392" width="34" height="18" rx="3" fill="#2a1d10" stroke="#d8b83a"/>
+  <text x="452" y="405" class="pinlbl" text-anchor="middle">BAT+</text>
+  <rect x="521" y="392" width="34" height="18" rx="3" fill="#1d1d1d" stroke="#8a8f96"/>
+  <text x="538" y="405" class="pinlbl" text-anchor="middle">BAT-</text>
+  <text x="495" y="434" class="sub" text-anchor="middle">(solder pads, underside)</text>
+
+  <!-- ═══════════ RD-03D ═══════════ -->
+  <rect x="60" y="160" width="180" height="200" rx="10" class="mod"/>
+  <text x="150" y="188" class="title" text-anchor="middle">RD-03D radar</text>
+  <text x="150" y="205" class="sub" text-anchor="middle">antenna faces out,</text>
+  <text x="150" y="219" class="sub" text-anchor="middle">keep clear of metal</text>
+  <g>
+    <circle cx="240" cy="250" r="5" class="pin"/><text x="228" y="254" class="pinlbl" text-anchor="end">VCC</text>
+    <circle cx="240" cy="278" r="5" class="pin"/><text x="228" y="282" class="pinlbl" text-anchor="end">GND</text>
+    <circle cx="240" cy="306" r="5" class="pin"/><text x="228" y="310" class="pinlbl" text-anchor="end">OT1 TX</text>
+    <circle cx="240" cy="334" r="5" class="pin"/><text x="228" y="338" class="pinlbl" text-anchor="end">RX</text>
+  </g>
+  <text x="66" y="352" class="sub">OT2: n/c</text>
+
+  <!-- radar wires -->
+  <!-- VCC: routed over the top, clear of the board -->
+  <path class="w5v" d="M240 250 L290 250 L290 100 L650 100 L650 280 L590 280"/>
+  <text x="300" y="93" class="note">VCC → 3V3 — test first (note 1)</text>
+  <!-- GND: below everything, up the right side -->
+  <path class="wgnd" d="M240 278 L330 278 L330 460 L630 460 L630 245 L590 245"/>
+  <!-- OT1 -> D0 -->
+  <path class="wtx" d="M240 306 L350 306 L350 210 L400 210"/>
+  <text x="300" y="300" class="pinlbl" fill="#4ac86e">OT1 → D0</text>
+  <!-- RX -> D1 -->
+  <path class="wrx" d="M240 334 L375 334 L375 245 L400 245"/>
+  <text x="282" y="328" class="pinlbl" fill="#4a9ec8">RX → D1</text>
+
+  <!-- ═══════════ battery + switch ═══════════ -->
+  <rect x="90" y="480" width="150" height="90" rx="10" class="pwr"/>
+  <text x="165" y="508" class="title" text-anchor="middle">1S LiPo</text>
+  <text x="165" y="526" class="sub" text-anchor="middle">3.7 V, protected</text>
+  <circle cx="240" cy="510" r="5" class="pin"/><text x="228" y="502" class="pinlbl" text-anchor="end">+</text>
+  <circle cx="240" cy="545" r="5" class="pin"/><text x="228" y="561" class="pinlbl" text-anchor="end">-</text>
+
+  <rect x="285" y="496" width="66" height="28" rx="6" fill="#1d2530" stroke="#8a8f96" stroke-width="1.5"/>
+  <text x="318" y="514" class="pinlbl" text-anchor="middle">switch</text>
+
+  <path class="wbat" d="M240 510 L285 510"/>
+  <path class="wbat" d="M351 510 L452 510 L452 410"/>
+  <path class="wgnd" d="M240 545 L538 545 L538 410"/>
+
+  <!-- sense divider: BAT+ -> 220k -> A2 node -> 220k -> GND -->
+  <rect x="472" y="500" width="54" height="20" rx="4" class="res"/>
+  <text x="499" y="514" class="pinlbl" text-anchor="middle">220k</text>
+  <rect x="596" y="500" width="54" height="20" rx="4" class="res"/>
+  <text x="623" y="514" class="pinlbl" text-anchor="middle">220k</text>
+  <path class="wsense" d="M452 510 L472 510"/>
+  <path class="wsense" d="M526 510 L561 510 L561 470 L385 470 L385 280 L400 280"/>
+  <path class="wsense" d="M561 510 L596 510"/>
+  <path class="wgnd" d="M650 510 L672 510 L672 545 L538 545"/>
+  <text x="560" y="493" class="pinlbl" fill="#c86ac8" text-anchor="middle">midpoint → A2</text>
+
+  <!-- ═══════════ fallback inset ═══════════ -->
+  <rect x="700" y="130" width="256" height="238" rx="10" fill="#141014" stroke="#6a5a7a" stroke-width="1.5"/>
+  <text x="828" y="156" class="title" text-anchor="middle" font-size="13">Fallback: radar needs 5 V</text>
+  <rect x="724" y="170" width="208" height="78" rx="8" class="pwr"/>
+  <text x="828" y="196" class="title" text-anchor="middle" font-size="13">18650 battery shield</text>
+  <text x="828" y="213" class="sub" text-anchor="middle">charge + protect + 5 V boost</text>
+  <text x="828" y="228" class="sub" text-anchor="middle">(one module, cell swappable)</text>
+  <text x="712" y="268" class="pinlbl">5V OUT → XIAO 5V + radar VCC</text>
+  <text x="712" y="288" class="pinlbl">GND → common ground</text>
+  <text x="712" y="308" class="pinlbl">divider taps the shield's B+</text>
+  <text x="712" y="332" class="sub">XIAO BAT pads unused here;</text>
+  <text x="712" y="347" class="sub">charge via the shield's USB.</text>
+
+  <!-- ═══════════ notes ═══════════ -->
+  <text x="700" y="400" class="title" font-size="13">Notes</text>
+  <text x="700" y="422" class="note">1. Try the radar on 3V3 first. If</text>
+  <text x="700" y="438" class="note">   it tracks poorly at range, use</text>
+  <text x="700" y="454" class="note">   the 18650 shield (5 V) instead.</text>
+  <text x="700" y="476" class="note">2. Charging = USB-C into the XIAO.</text>
+  <text x="700" y="498" class="note">3. XIAO 5V pin is live on USB only</text>
+  <text x="700" y="514" class="note">   — don't power the radar from it.</text>
+  <text x="700" y="536" class="note">4. Divider drain ~9 uA. Display</text>
+  <text x="700" y="552" class="note">   shows "bat %" from the packet —</text>
+  <text x="700" y="568" class="note">   no indicator module needed.</text>
+
+  <text x="24" y="614" class="sub">RadarScope P4 — docs/wiring.svg · Wire colors: red=power · grey=GND · green=radar TX · blue=radar RX · yellow=battery · purple=sense</text>
+  <text x="24" y="630" class="sub">RD-03D pin order on the 1.27 mm connector varies by batch — trust the silkscreen labels, not the position.</text>
+</svg>

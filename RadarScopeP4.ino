@@ -60,7 +60,13 @@ struct __attribute__((packed)) UdpPacket {
   uint32_t magic;
   uint32_t frameCount;
   Target   targets[ui::kMaxTargets];
+  // Battery tail sent by this repo's sender/ sketch; the stock sender's
+  // packets are 32 bytes and simply don't include it.
+  uint16_t batMv;
+  uint8_t  batPct;
+  uint8_t  version;
 };
+static const int kPktBaseSz = 32;  // stock sender packet size (no battery tail)
 
 // ---- State --------------------------------------------------
 static Board*    board = nullptr;
@@ -74,6 +80,7 @@ static uint32_t   frameCount   = 0;
 static uint32_t   lastPacketMs = 0;
 static bool       senderSeen   = false;
 static bool       muted        = false;
+static int        senderBatPct = -1;  // -1 = unknown / stock sender
 
 // Ghost filter (upstream): a target that hasn't moved > kMoveThreshMm for 2 s
 // is hidden until it moves again (the RD-03D can't see truly static people, so
@@ -96,8 +103,8 @@ static SimWalker sim[ui::kMaxTargets];
 // ---- UDP receive --------------------------------------------
 static void receiveUdp() {
   int sz = udp.parsePacket();
-  if (sz < (int)sizeof(UdpPacket)) return;
-  UdpPacket pkt;
+  if (sz < kPktBaseSz) return;
+  UdpPacket pkt = {};
   udp.read((uint8_t*)&pkt, sizeof(pkt));
   if (pkt.magic != kMagic) return;
 
@@ -105,6 +112,8 @@ static void receiveUdp() {
   lastPacketMs = millis();
   senderSeen   = true;
   simActive    = false;
+  senderBatPct = (sz >= (int)sizeof(UdpPacket) && pkt.version >= 1 && pkt.batPct <= 100)
+                     ? pkt.batPct : -1;
 
   for (int i = 0; i < ui::kMaxTargets; i++) {
     if (pkt.targets[i].valid) {
@@ -294,7 +303,8 @@ void loop() {
     pingerSetMuted(muted);
 
     ui::Status st;
-    st.senderAlive = senderSeen && (now - lastPacketMs) < 3000;
+    st.senderAlive  = senderSeen && (now - lastPacketMs) < 3000;
+    st.senderBatPct = senderBatPct;
     st.simMode     = simActive;
     st.muted       = muted;
     st.frameCount  = frameCount;
