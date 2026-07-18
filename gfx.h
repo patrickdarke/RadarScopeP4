@@ -1,10 +1,10 @@
 #pragma once
 #include <cstdint>
 
-// Shared software-rendering primitives for the dashboard compositor and the
-// storm / environment instruments. The plane instrument reuses the plane
-// radar's own primitives (radar_render.cpp) verbatim; these mirror them so the
-// rest of the dashboard can draw without pulling in that translation unit.
+// Software-rendering primitives for RGB565 framebuffers: a plain raster layer
+// (pixels, lines, rects, circles, 5x7 bitmap text) plus an anti-aliased layer
+// (alpha blending, SDF discs/rings/rounded-rects, baked AA fonts) used by the
+// radar scope renderer.
 namespace gfx {
 
 inline uint16_t rgb(uint8_t r, uint8_t g, uint8_t b) {
@@ -31,7 +31,7 @@ void fillCircle(const Canvas& c, int cx, int cy, int r, uint16_t col);
 void fillTri(const Canvas& c, int x0, int y0, int x1, int y1, int x2, int y2, uint16_t col);
 
 // Filled radial band from angle a0 to a1 (degrees, 0 = up/north, clockwise),
-// spanning radii [r - thickness, r]. Used for the air-quality gauge arc.
+// spanning radii [r - thickness, r].
 void arcBand(const Canvas& c, int cx, int cy, int r, int thickness, double a0Deg, double a1Deg,
              uint16_t col);
 
@@ -42,9 +42,7 @@ void drawTextCentered(const Canvas& c, int cx, int y, const char* str, int s, ui
 int textW(const char* str, int s);
 
 // Blit a `sw`x`sh` source buffer onto `dst` with its top-left at (ox,oy).
-// If `circleMask`, only the inscribed circle of the source square is copied
-// (so 3-up instruments read as round scopes). Pixels equal to `keyOut` in the
-// source are treated as transparent when `useKey` is set.
+// If `circleMask`, only the inscribed circle of the source square is copied.
 void blit(const Canvas& dst, int ox, int oy, const uint16_t* src, int sw, int sh, bool circleMask);
 
 // ---- Anti-aliased layer (RadarScope polish pass) ---------------------------

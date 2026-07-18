@@ -56,8 +56,9 @@
 #define RGB_PIN_NUM_DATA15  (15)
 
 // SDIO interface pins for the onboard ESP32-C6 (esp-hosted Wi-Fi)
-// NOTE: these are ELECROW's V1.0 values. Their 10.1" sibling board remapped
-// IO53/54 <-> IO27/28 on rev V1.2 -- if Wi-Fi never comes up, suspect a remap.
+// NOTE: these are ELECROW's V1.0 values. ELECROW has remapped wireless-adjacent
+// pins between revisions in this series -- if Wi-Fi never comes up on a later
+// board revision, check these against the wiki for your exact rev.
 #define WIFI_HOSTED_SDIO_PIN_CMD    (54)  // SDIO Command/Response line
 #define WIFI_HOSTED_SDIO_PIN_CLK    (53)  // SDIO Serial Clock
 #define WIFI_HOSTED_SDIO_PIN_D0     (52)  // SDIO Data line 0

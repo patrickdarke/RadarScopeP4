@@ -102,7 +102,7 @@ cd tools && c++ -std=c++17 -O2 -I.. preview.cpp ../radar_ui.cpp ../gfx.cpp -o /t
 
 ## Board facts (CrowPanel Advance 5.0" V1.0, from ELECROW's lessons)
 
-- Panel: 800×480 **RGB ST7262** (not MIPI-DSI like the 10.1") — timings/pins
+- Panel: 800×480 **RGB ST7262** (parallel RGB, not MIPI-DSI) — timings/pins
   in `board_config.h`, consumed by `esp_panel_board_custom_conf.h`
   (ELECROW Lesson07, verbatim).
 - Touch: GT911 — I2C SCL 46 / SDA 45, RST 36, INT 42.
@@ -131,11 +131,11 @@ cd tools && c++ -std=c++17 -O2 -I.. preview.cpp ../radar_ui.cpp ../gfx.cpp -o /t
   init order, and that nothing re-initialized the bus.
 - **Colors wrong / channels swapped** → RGB565 byte order; try swapping bytes
   in `present()` or check `ESP_PANEL_BOARD_LCD_RGB_PIXEL_BITS`.
-- **Wi-Fi never comes up** → the 10.1" sibling remapped IO53/54 ↔ IO27/28 on
-  rev V1.2; if this 5" board is a later rev, suspect the same (SDIO pins in
-  `board_config.h`).
-- **Image shivers/tears** → the S3 boards needed an internal-SRAM bounce
-  buffer for RGB scanout; if the P4 shows the same, look at
+- **Wi-Fi never comes up** → ELECROW has remapped wireless-adjacent pins
+  between revisions in this board series; if yours is a later rev than V1.0,
+  check the SDIO pins in `board_config.h` against the wiki for your rev.
+- **Image shivers/tears** → RGB-scanout boards sometimes need an
+  internal-SRAM bounce buffer; if the P4 shows this, look at
   `configRGB_BounceBufferSize` in the panel conf.
 - **No sound** → amp enable is via STC8 I2C (active LOW), volume is `kGain`
   in `pinger.cpp`; speaker must be on its header.
