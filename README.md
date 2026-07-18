@@ -2,7 +2,8 @@
 
 Port of [Stevee87/Arduino-ESP32-Radarproject](https://github.com/Stevee87/Arduino-ESP32-Radarproject)'s
 Arduino GIGA receiver to the **ELECROW CrowPanel Advance 5.0" ESP32-P4**
-(800×480 IPS RGB, GT911 touch, ESP32-C6 Wi-Fi over SDIO).
+(800×480 IPS RGB, GT911 touch, ESP32-C6 Wi-Fi over SDIO) — with thanks to
+Stevee87 for the original design (see [Credits](#credits--thanks)).
 
 ![RadarScope P4 — host-rendered preview in SIM MODE](docs/preview.png)
 
@@ -139,10 +140,16 @@ cd tools && c++ -std=c++17 -O2 -I.. preview.cpp ../radar_ui.cpp ../gfx.cpp -o /t
 - **No sound** → amp enable is via STC8 I2C (active LOW), volume is `kGain`
   in `pinger.cpp`; speaker must be on its header.
 
-## Credits & licenses
+## Credits & thanks
 
-- Original radar system (protocol, scope design, sender firmware):
-  [Stevee87/Arduino-ESP32-Radarproject](https://github.com/Stevee87/Arduino-ESP32-Radarproject) (MIT).
+This project is a port of
+[**Stevee87/Arduino-ESP32-Radarproject**](https://github.com/Stevee87/Arduino-ESP32-Radarproject)
+— the radar protocol, the scope design, the target tracking/clustering, and
+the whole two-node concept are Stevee87's work (MIT). Many thanks for building
+it and sharing it; this repo only re-homes the display onto different hardware
+and adds trimmings on top of that foundation.
+
+Also credited:
 - Board support (`esp_panel_board_custom_conf.h`, `esp_panel_drivers_conf.h`,
   `bsp_i2c.*`, `bsp_stc8h1kxx.*`): from
   [ELECROW's examples](https://github.com/Elecrow-RD/-CrowPanel-Advanced-5inch-ESP32-P4-HMI-AI-Display-800x480-IPS-Touch-Screen)
