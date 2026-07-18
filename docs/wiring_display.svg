@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 640" font-family="Menlo, Consolas, monospace">
+  <defs>
+    <style>
+      .board  { fill: #12241a; stroke: #3fae5f; stroke-width: 2; }
+      .chip   { fill: #101d2b; stroke: #4a86c8; stroke-width: 2; }
+      .helper { fill: #1d1626; stroke: #8a6ac8; stroke-width: 2; }
+      .pwr    { fill: #241410; stroke: #c8703a; stroke-width: 2; }
+      .ext    { fill: #141a14; stroke: #6a7a6a; stroke-width: 1.5; }
+      .title  { fill: #eaf6ee; font-size: 15px; font-weight: bold; }
+      .sub    { fill: #8fb89f; font-size: 11px; }
+      .lbl    { fill: #cfe8d8; font-size: 12px; }
+      .dim    { fill: #7a9a86; font-size: 10px; }
+      .note   { fill: #d8c27a; font-size: 12px; }
+      .bus    { stroke: #4ac86e; stroke-width: 3; fill: none; }
+      .i2c    { stroke: #c8b04a; stroke-width: 2.5; fill: none; }
+      .sdio   { stroke: #4a9ec8; stroke-width: 3; fill: none; }
+      .i2s    { stroke: #c86ac8; stroke-width: 2.5; fill: none; }
+      .ctl    { stroke: #8a6ac8; stroke-width: 2; fill: none; stroke-dasharray: 5 4; }
+      .pwrw   { stroke: #e05a3a; stroke-width: 2.5; fill: none; }
+      .rf     { stroke: #4a9ec8; stroke-width: 2; fill: none; stroke-dasharray: 2 5; }
+    </style>
+  </defs>
+
+  <rect width="980" height="640" fill="#0a0f0c"/>
+  <text x="24" y="34" class="title" font-size="19">RadarScope display — CrowPanel Advance 5.0" (all-in-one)</text>
+  <text x="24" y="54" class="sub">Nothing to solder on this side: USB-C for power + flashing, speaker on its header, optional battery. Internals shown for debugging.</text>
+
+  <!-- ═══════════ board outline ═══════════ -->
+  <rect x="30" y="92" width="606" height="466" rx="14" class="board"/>
+  <text x="46" y="116" class="title">CrowPanel Advance 5.0" ESP32-P4</text>
+
+  <!-- panel -->
+  <rect x="56" y="132" width="332" height="86" rx="8" class="chip"/>
+  <text x="222" y="158" class="title" text-anchor="middle" font-size="13">5.0" IPS panel · 800×480</text>
+  <text x="222" y="176" class="sub" text-anchor="middle">ST7262 driver, parallel RGB</text>
+  <text x="222" y="192" class="sub" text-anchor="middle">42 Hz @ 18 MHz pixel clock</text>
+
+  <!-- touch -->
+  <rect x="416" y="132" width="196" height="86" rx="8" class="chip"/>
+  <text x="514" y="158" class="title" text-anchor="middle" font-size="13">GT911 touch</text>
+  <text x="514" y="176" class="sub" text-anchor="middle">I2C · RST 36 · INT 42</text>
+  <text x="514" y="192" class="sub" text-anchor="middle">(mute button taps)</text>
+
+  <!-- P4 -->
+  <rect x="196" y="286" width="228" height="104" rx="8" class="chip"/>
+  <text x="310" y="314" class="title" text-anchor="middle" font-size="13">ESP32-P4</text>
+  <text x="310" y="332" class="sub" text-anchor="middle">dual-core RISC-V, 400 MHz</text>
+  <text x="310" y="348" class="sub" text-anchor="middle">32 MB PSRAM · 16 MB flash</text>
+  <text x="310" y="364" class="sub" text-anchor="middle">runs RadarScopeP4.ino</text>
+
+  <!-- C6 -->
+  <rect x="472" y="286" width="140" height="104" rx="8" class="chip"/>
+  <text x="542" y="312" class="title" text-anchor="middle" font-size="13">ESP32-C6</text>
+  <text x="542" y="330" class="sub" text-anchor="middle">Wi-Fi 6 radio</text>
+  <text x="542" y="346" class="sub" text-anchor="middle">hosts "RadarNet"</text>
+  <text x="542" y="362" class="sub" text-anchor="middle">AP · UDP 4210</text>
+
+  <!-- STC8 -->
+  <rect x="56" y="428" width="264" height="106" rx="8" class="helper"/>
+  <text x="188" y="452" class="title" text-anchor="middle" font-size="13">STC8H1KXX helper MCU</text>
+  <text x="188" y="470" class="sub" text-anchor="middle">I2C addr 0x2F</text>
+  <text x="188" y="486" class="sub" text-anchor="middle">backlight PWM · amp enable</text>
+  <text x="188" y="502" class="sub" text-anchor="middle">battery charge + level</text>
+
+  <!-- amp -->
+  <rect x="364" y="428" width="180" height="106" rx="8" class="chip"/>
+  <text x="454" y="452" class="title" text-anchor="middle" font-size="13">Audio amp</text>
+  <text x="454" y="470" class="sub" text-anchor="middle">no codec — raw I2S</text>
+  <text x="454" y="486" class="sub" text-anchor="middle">sonar pings from</text>
+  <text x="454" y="502" class="sub" text-anchor="middle">pinger.cpp</text>
+
+  <!-- ═══════════ internal buses ═══════════ -->
+  <path class="bus" d="M222 218 L222 260 L310 260 L310 286"/>
+  <text x="230" y="252" class="lbl" fill="#4ac86e">16-bit RGB + sync</text>
+  <path class="i2c" d="M514 218 L514 250 L360 250 L360 286"/>
+  <path class="i2c" d="M188 428 L188 404 L260 404 L260 390"/>
+  <text x="106" y="400" class="lbl" fill="#c8b04a">I2C 45/46 (shared)</text>
+  <path class="sdio" d="M424 338 L472 338"/>
+  <text x="448" y="326" class="lbl" fill="#4a9ec8" text-anchor="middle">SDIO</text>
+  <text x="542" y="406" class="dim" text-anchor="middle">CMD54 CLK53 D0-D3 52-49</text>
+  <text x="542" y="420" class="dim" text-anchor="middle">C6 reset GPIO 20</text>
+  <path class="i2s" d="M380 390 L380 404 L420 404 L420 428"/>
+  <text x="290" y="416" class="lbl" fill="#c86ac8">I2S 21/22/23</text>
+  <path class="ctl" d="M320 480 L364 480"/>
+  <path class="ctl" d="M120 428 L120 218"/>
+  <text x="64" y="240" class="dim">backlight</text>
+  <text x="64" y="254" class="dim">PWM</text>
+  <text x="326" y="472" class="dim">enable</text>
+
+  <!-- ═══════════ external: USB ═══════════ -->
+  <rect x="662" y="120" width="120" height="54" rx="8" class="pwr"/>
+  <text x="722" y="142" class="title" text-anchor="middle" font-size="12">USB-C UART0</text>
+  <text x="722" y="160" class="sub" text-anchor="middle">flash + power</text>
+  <path class="pwrw" d="M662 147 L636 147"/>
+
+  <rect x="662" y="188" width="120" height="54" rx="8" class="ext"/>
+  <text x="722" y="210" class="title" text-anchor="middle" font-size="12">USB-C USB 2.0</text>
+  <text x="722" y="228" class="sub" text-anchor="middle">device port (unused)</text>
+  <path class="wgnd" stroke="#6a7a6a" stroke-width="2" d="M662 215 L636 215"/>
+
+  <!-- ═══════════ external: speaker ═══════════ -->
+  <rect x="662" y="428" width="120" height="70" rx="8" class="ext"/>
+  <text x="722" y="454" class="title" text-anchor="middle" font-size="12">Speaker</text>
+  <text x="722" y="472" class="sub" text-anchor="middle">plugs into the</text>
+  <text x="722" y="486" class="sub" text-anchor="middle">speaker header</text>
+  <path class="i2s" d="M544 480 L662 480"/>
+
+  <!-- ═══════════ external: battery ═══════════ -->
+  <rect x="662" y="516" width="120" height="70" rx="8" class="pwr"/>
+  <text x="722" y="542" class="title" text-anchor="middle" font-size="12">1S LiPo</text>
+  <text x="722" y="560" class="sub" text-anchor="middle">optional — battery</text>
+  <text x="722" y="574" class="sub" text-anchor="middle">connector on board</text>
+  <path class="pwrw" d="M662 550 L600 550 L600 534"/>
+
+  <!-- ═══════════ RF link to sender ═══════════ -->
+  <rect x="810" y="286" width="146" height="104" rx="10" class="chip"/>
+  <text x="883" y="314" class="title" text-anchor="middle" font-size="13">Radar node</text>
+  <text x="883" y="332" class="sub" text-anchor="middle">XIAO + RD-03D</text>
+  <text x="883" y="348" class="sub" text-anchor="middle">joins RadarNet,</text>
+  <text x="883" y="364" class="sub" text-anchor="middle">see wiring.svg</text>
+  <path class="rf" d="M612 320 C 680 290, 740 290, 810 320"/>
+  <path class="rf" d="M612 350 C 680 380, 740 380, 810 350"/>
+  <text x="711" y="342" class="lbl" fill="#4a9ec8" text-anchor="middle">Wi-Fi · UDP</text>
+
+  <!-- ═══════════ notes ═══════════ -->
+  <text x="810" y="120" class="title" font-size="13">Notes</text>
+  <text x="810" y="142" class="note">1. Flash: UART0 USB-C —</text>
+  <text x="810" y="158" class="note">   hold BOOT, tap RESET.</text>
+  <text x="810" y="180" class="note">2. Power-cycle after a</text>
+  <text x="810" y="196" class="note">   flash if Wi-Fi wedges.</text>
+  <text x="810" y="218" class="note">3. Speaker only needed</text>
+  <text x="810" y="234" class="note">   for the sonar pings.</text>
+  <text x="810" y="256" class="note">4. Battery is optional;</text>
+  <text x="810" y="272" class="note">   USB-only works fine.</text>
+
+  <text x="24" y="614" class="sub">RadarScope P4 — docs/wiring_display.svg · Internal buses are fixed on the PCB; shown for debugging, nothing to wire yourself.</text>
+  <text x="24" y="630" class="sub">Dashed purple = control (backlight PWM, amp enable via STC8) · dashed blue = wireless link.</text>
+</svg>

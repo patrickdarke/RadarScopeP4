@@ -100,6 +100,15 @@ cd tools && c++ -std=c++17 -O2 -I.. preview.cpp ../radar_ui.cpp ../gfx.cpp -o /t
 /tmp/radar_prev /tmp/preview.ppm
 ```
 
+## Display unit
+
+The display side is all-in-one — nothing to solder. USB-C (UART0 port) for
+power and flashing, the speaker plugs into its header, and a battery is
+optional. The internal architecture below is fixed on the PCB; it's shown
+because it's what you're debugging when something misbehaves:
+
+![Display unit diagram](docs/wiring_display.svg)
+
 ## Board facts (CrowPanel Advance 5.0" V1.0, from ELECROW's lessons)
 
 - Panel: 800×480 **RGB ST7262** (parallel RGB, not MIPI-DSI) — timings/pins
