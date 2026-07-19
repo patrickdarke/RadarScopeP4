@@ -21,6 +21,9 @@ Two sender options, both compatible:
   [`rd03d_xiao_s3_transmitter`](https://github.com/Stevee87/Arduino-ESP32-Radarproject/tree/main/Firmware)
   sketch — works unmodified (no battery readout).
 
+**Parts:** see [PARTS.md](PARTS.md) for the full BOM with source links
+(~$95–115 for the complete build).
+
 ## Sender wiring
 
 ![Sender wiring diagram](docs/wiring.svg)
