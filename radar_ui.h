@@ -18,6 +18,7 @@ constexpr int   kRadarR     = 440;
 constexpr float kMaxDistMm  = 8000.0f;
 constexpr float kSectorHalf = 60.0f;
 constexpr int   kMaxTargets = 3;
+constexpr int   kMaxPulses  = 4;   // concurrent radiating pulse rings
 
 // Mute button (top-right, under the info box)
 constexpr int kBtnX = 660, kBtnY = 114, kBtnW = 136, kBtnH = 36;
@@ -35,6 +36,10 @@ struct Status {
   int      targetCount;   // valid && !stale
   int      senderBatPct;  // sender battery 0..100, -1 = unknown/stock sender
   char     apInfo[24];    // e.g. "AP: RadarNet"
+  // Radiating pulse rings (the free-running sonar sweep): phase 0 =
+  // launching from the origin, 1 = reached the rim, < 0 = slot inactive.
+  float    pulsePhase[kMaxPulses];
+  bool     pulseContact[kMaxPulses];  // true = brighter variant
 };
 
 // Range scale + projection (verbatim math from the upstream sketch).

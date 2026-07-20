@@ -33,6 +33,9 @@ int main(int argc, char** argv) {
   st.targetCount  = 3;
   st.senderBatPct = 87;
   snprintf(st.apInfo, sizeof(st.apInfo), "AP: RadarNet");
+  for (int i = 0; i < ui::kMaxPulses; i++) st.pulsePhase[i] = -1.0f;
+  st.pulsePhase[0]   = 0.42f;   // the sonar sweep, mid-flight
+  st.pulseContact[0] = false;
 
   gfx::Canvas fbc{fb, ui::kScreenW, ui::kScreenH};
   ui::composeFrame(fbc, bg, targets, stale, st);

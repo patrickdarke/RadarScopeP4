@@ -132,7 +132,7 @@ static float frnd(float lo, float hi) {
 
 static void simInit() {
   for (int i = 0; i < ui::kMaxTargets; i++) {
-    sim[i].on = (i < 2);  // two walkers
+    sim[i].on = (i < 1);  // one walker -- lets the distance->sound mapping be judged cleanly
     sim[i].angDeg  = frnd(-45, 45);
     sim[i].distMm  = frnd(1500, 6000);
     sim[i].velAng  = frnd(-6, 6);       // deg/s
@@ -312,6 +312,15 @@ void loop() {
     for (int i = 0; i < ui::kMaxTargets; i++)
       if (targets[i].valid && !staleNow[i]) st.targetCount++;
     snprintf(st.apInfo, sizeof(st.apInfo), "AP: %s", kApSsid);
+
+    // Free-running radiating sweep: launches from the origin on its own
+    // steady period, independent of the audio pings.
+    static const uint32_t kPulseTravelMs = 3000;
+    static const uint32_t kPulsePeriodMs = 3500;
+    for (int i = 0; i < ui::kMaxPulses; i++) st.pulsePhase[i] = -1.0f;
+    uint32_t ph = now % kPulsePeriodMs;
+    st.pulsePhase[0]   = (ph < kPulseTravelMs) ? (float)ph / kPulseTravelMs : -1.0f;
+    st.pulseContact[0] = false;
 
     gfx::Canvas fbc{g_fb, ui::kScreenW, ui::kScreenH};
     ui::composeFrame(fbc, g_bg, targets, staleNow, st);

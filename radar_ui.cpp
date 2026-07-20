@@ -168,10 +168,56 @@ static void textShadowed(const gfx::Canvas& c, int x, int y, const char* s,
   gfx::drawTextAA(c, x, y, s, f, col);
 }
 
+// Radiating pulse: an AA ring band expanding from the origin to the rim,
+// clipped to the fan sector, fading as it travels. Spans are computed per
+// row from the ring geometry so only band pixels are touched (~8 k worst
+// case), cheap enough for every frame.
+static void drawPulse(const gfx::Canvas& fb, float phase, bool contact) {
+  if (phase < 0.0f || phase >= 1.0f) return;
+  const float r    = 24.0f + phase * (kRadarR - 24.0f);
+  const float hw   = 3.0f + 5.0f * phase;              // band half-width grows
+  const float aTop = contact ? 165.0f : 115.0f;
+  const float aAmt = aTop * (1.0f - 0.85f * phase);    // fade toward the rim
+  const uint16_t col = contact ? gfx::rgb(140, 255, 160) : gfx::rgb(70, 210, 100);
+  const float tanS = tanf(kSectorHalf * (float)M_PI / 180.0f);
+  const float rin = r - hw, rout = r + hw + 1.0f;
+  int y0 = kRadarCY - (int)rout - 1; if (y0 < 0) y0 = 0;
+  for (int y = y0; y < kScreenH; y++) {
+    float dy = (float)(kRadarCY - y);
+    if (dy >= rout) continue;
+    float xo = sqrtf(rout * rout - dy * dy);
+    float xi = (dy >= rin || rin <= 0.0f) ? 0.0f : sqrtf(rin * rin - dy * dy);
+    for (int side = 0; side < 2; side++) {
+      int xa = side ? kRadarCX + (int)xi : kRadarCX - (int)xo;
+      int xb = side ? kRadarCX + (int)xo : kRadarCX - (int)xi;
+      if (xa < 0) xa = 0;
+      if (xb > fb.w - 1) xb = fb.w - 1;
+      for (int x = xa; x <= xb; x++) {
+        float dx = (float)(x - kRadarCX);
+        float dist = sqrtf(dx * dx + dy * dy);
+        float cov = hw + 0.5f - fabsf(dist - r);         // band AA
+        if (cov <= 0.0f) continue;
+        if (cov > 1.0f) cov = 1.0f;
+        float edge = 0.5f * (dy * tanS - fabsf(dx)) + 0.5f;  // sector AA
+        if (edge <= 0.0f) continue;
+        if (edge > 1.0f) edge = 1.0f;
+        float rim = kRadarR + 0.5f - dist;               // stay inside the rim
+        if (rim <= 0.0f) continue;
+        if (rim > 1.0f) rim = 1.0f;
+        gfx::blendPx(fb, x, y, col, (uint8_t)(aAmt * cov * edge * rim));
+      }
+    }
+  }
+}
+
 void composeFrame(const gfx::Canvas& fb, const uint16_t* bg,
                   const Target targets[kMaxTargets], const bool stale[kMaxTargets],
                   const Status& st) {
   memcpy(fb.fb, bg, (size_t)fb.w * fb.h * 2);
+
+  // Pulses radiate beneath the target markers
+  for (int i = 0; i < kMaxPulses; i++)
+    drawPulse(fb, st.pulsePhase[i], st.pulseContact[i]);
 
   // Targets: soft glow + AA ring + core, labels with a drop shadow
   for (int i = 0; i < kMaxTargets; i++) {

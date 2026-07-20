@@ -48,10 +48,19 @@ absent — so any sender/display pairing works.
 
 ## Status
 
-- **Compiles clean** for the P4 (`arduino-cli`, core 3.3.10). Not yet run on
-  hardware.
-- Renderer verified on the host (`tools/preview.cpp` renders the real compose
-  path to a PPM — layout matches the GIGA original).
+- **Running on hardware**: display bring-up verified on the CrowPanel Advance
+  5.0" — panel, C6 AP, touch, speaker, SIM mode all working (flashed over the
+  P4's native USB port; see Build).
+- Renderer also verified on the host (`tools/preview.cpp` renders the real
+  compose path to a PPM — layout matches the GIGA original).
+- **Motion-tracker audio**: both sounds are synthesized in `audio_clips.h`
+  (regenerate with `tools/gen_audio.py`) — a pure tone shaped by an envelope
+  demodulated from a reference recording of the film scene, so the contact
+  ping keeps its real ~7 Hz warble and trailing echo pulse. No third-party
+  audio is embedded; the tables are just measurements.
+- **Sonar sweep**: a free-running radiating pulse ring launches from the
+  origin every 3.5 s and travels to the rim in 3 s (independent of the audio
+  cadence).
 - **Polish pass done** (still no LVGL): the background is an analytic per-pixel
   render — coverage-based AA for the fan, ring bands, and spokes (no stipple),
   with a radial gradient. Targets are AA glow/ring/core markers, panels and the
@@ -60,16 +69,17 @@ absent — so any sender/display pairing works.
   `tools/gen_font.py`, needs Pillow). The analytic background costs a few
   hundred ms once at boot; the per-frame path is unchanged (memcpy + overlays).
 - **SIM MODE** is built in: until a sender is heard (and again if it goes
-  quiet for 30 s), two synthetic walkers roam the scope, so display, touch,
-  and audio can be verified before the RD-03D arrives. The info box shows an
-  amber `SIM MODE` badge; the first real packet switches it off.
+  quiet for 30 s), a synthetic walker roams the scope, so display, touch,
+  and audio can be verified before the RD-03D arrives (one walker, so the
+  distance→sound mapping is easy to judge). The info box shows an amber
+  `SIM MODE` badge; the first real packet switches it off.
 
 ## What changed vs the GIGA build
 
 | | GIGA original | This port |
 |---|---|---|
 | Rendering | incremental erase/redraw + 10 s full repaint | full-frame recompose from a pre-rendered background (two 768 KB PSRAM buffers) |
-| Sound | passive piezo on pin 9 (`tone()`) | onboard speaker, raw I2S 16 kHz sine pings (`pinger.cpp`); same distance→tempo/pitch curve |
+| Sound | passive piezo on pin 9 (`tone()`) | onboard speaker, raw I2S 16 kHz motion-tracker sounds (`pinger.cpp`): synthesized contact ping (echo pulse + warble) and idle scan blip; distance drives tempo (1.25 s → 150 ms) and pitch (1675 → 2150 Hz, front-loaded t² curve) |
 | Touch | GIGA shield, portrait-raw coords rotated in code | GT911 via ESP32_Display_Panel, native 800×480 coords |
 | Mute button | "BUZZER AN"/"STUMM" | "SOUND ON"/"MUTED", rounded AA button top-right |
 | Wi-Fi | GIGA hosts AP natively | ESP32-C6 over SDIO (esp-hosted), `WiFi.setPins()` then `softAP()` |
