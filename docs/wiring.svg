@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 640" font-family="Menlo, Consolas, monospace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 880" font-family="Menlo, Consolas, monospace">
   <defs>
     <style>
       .board  { fill: #12241a; stroke: #3fae5f; stroke-width: 2; }
@@ -17,12 +17,15 @@
       .wbat   { stroke: #d8b83a; stroke-width: 2.5; fill: none; }
       .wsense { stroke: #c86ac8; stroke-width: 2.5; fill: none; }
       .res    { fill: #1d1d10; stroke: #d8b83a; stroke-width: 1.5; }
+      .jbat   { fill: #d8b83a; }
+      .jgnd   { fill: #8a8f96; }
+      .jsen   { fill: #c86ac8; }
     </style>
   </defs>
 
-  <rect width="980" height="640" fill="#0a0f0c"/>
+  <rect width="1000" height="880" fill="#0a0f0c"/>
   <text x="24" y="34" class="title" font-size="19">RadarScope sender — untethered node wiring</text>
-  <text x="24" y="54" class="sub">XIAO ESP32-S3 + RD-03D + 1S LiPo (battery straight to the XIAO's own charger — no TP4056, no boost)</text>
+  <text x="24" y="54" class="sub">XIAO ESP32-S3 + RD-03D + 1S LiPo (battery straight to the XIAO's own charger — no TP4056, no boost). Dots = solder joints.</text>
 
   <!-- ═══════════ XIAO ESP32-S3 ═══════════ -->
   <rect x="400" y="130" width="190" height="290" rx="14" class="board"/>
@@ -47,12 +50,12 @@
     <circle cx="590" cy="245" r="5" class="pin"/><text x="578" y="249" class="pinlbl" text-anchor="end">GND</text>
     <circle cx="590" cy="280" r="5" class="pin"/><text x="578" y="284" class="pinlbl" text-anchor="end">3V3</text>
   </g>
-  <!-- battery pads underneath -->
-  <rect x="435" y="392" width="34" height="18" rx="3" fill="#2a1d10" stroke="#d8b83a"/>
-  <text x="452" y="405" class="pinlbl" text-anchor="middle">BAT+</text>
-  <rect x="521" y="392" width="34" height="18" rx="3" fill="#1d1d1d" stroke="#8a8f96"/>
-  <text x="538" y="405" class="pinlbl" text-anchor="middle">BAT-</text>
-  <text x="495" y="434" class="sub" text-anchor="middle">(solder pads, underside)</text>
+  <!-- battery pads, flush with bottom edge -->
+  <text x="495" y="392" class="sub" text-anchor="middle">solder pads, underside:</text>
+  <rect x="435" y="400" width="34" height="20" rx="3" fill="#2a1d10" stroke="#d8b83a"/>
+  <text x="452" y="414" class="pinlbl" text-anchor="middle">BAT+</text>
+  <rect x="521" y="400" width="34" height="20" rx="3" fill="#1d1d1d" stroke="#8a8f96"/>
+  <text x="538" y="414" class="pinlbl" text-anchor="middle">BAT-</text>
 
   <!-- ═══════════ RD-03D ═══════════ -->
   <rect x="60" y="160" width="180" height="200" rx="10" class="mod"/>
@@ -67,43 +70,59 @@
   </g>
   <text x="66" y="352" class="sub">OT2: n/c</text>
 
-  <!-- radar wires -->
-  <!-- VCC: routed over the top, clear of the board -->
-  <path class="w5v" d="M240 250 L290 250 L290 100 L650 100 L650 280 L590 280"/>
-  <text x="300" y="93" class="note">VCC → 3V3 — test first (note 1)</text>
-  <!-- GND: below everything, up the right side -->
-  <path class="wgnd" d="M240 278 L330 278 L330 460 L630 460 L630 245 L590 245"/>
-  <!-- OT1 -> D0 -->
-  <path class="wtx" d="M240 306 L350 306 L350 210 L400 210"/>
-  <text x="300" y="300" class="pinlbl" fill="#4ac86e">OT1 → D0</text>
-  <!-- RX -> D1 -->
-  <path class="wrx" d="M240 334 L375 334 L375 245 L400 245"/>
-  <text x="282" y="328" class="pinlbl" fill="#4a9ec8">RX → D1</text>
+  <!-- radar wires: VCC + GND over the top, data straight across -->
+  <path class="w5v" d="M240 250 L260 250 L260 100 L660 100 L660 280 L590 280"/>
+  <text x="300" y="93" class="note">VCC → 3V3 — test 3.3 V first (note 3)</text>
+  <path class="wgnd" d="M240 278 L275 278 L275 115 L630 115 L630 245 L590 245"/>
+  <text x="300" y="133" class="pindim">GND → GND</text>
+  <path class="wtx" d="M240 306 L300 306 L300 210 L400 210"/>
+  <text x="250" y="300" class="pinlbl" fill="#4ac86e">→ D0</text>
+  <path class="wrx" d="M240 334 L320 334 L320 245 L400 245"/>
+  <text x="250" y="328" class="pinlbl" fill="#4a9ec8">→ D1</text>
 
-  <!-- ═══════════ battery + switch ═══════════ -->
-  <rect x="90" y="480" width="150" height="90" rx="10" class="pwr"/>
-  <text x="165" y="508" class="title" text-anchor="middle">1S LiPo</text>
-  <text x="165" y="526" class="sub" text-anchor="middle">3.7 V, protected</text>
-  <circle cx="240" cy="510" r="5" class="pin"/><text x="228" y="502" class="pinlbl" text-anchor="end">+</text>
-  <circle cx="240" cy="545" r="5" class="pin"/><text x="228" y="561" class="pinlbl" text-anchor="end">-</text>
+  <!-- ═══════════ power section — point-to-point, no crossings ═══════════ -->
 
-  <rect x="285" y="496" width="66" height="28" rx="6" fill="#1d2530" stroke="#8a8f96" stroke-width="1.5"/>
-  <text x="318" y="514" class="pinlbl" text-anchor="middle">switch</text>
+  <!-- BAT+ net (yellow): BAT+ pad -> J1 (divider tap) -> switch -> LiPo + -->
+  <path class="wbat" d="M452 420 L452 562 L560 562"/>
+  <path class="wbat" d="M640 562 L740 562"/>
+  <text x="462" y="545" class="pinlbl" fill="#d8b83a">to BAT+ pad</text>
 
-  <path class="wbat" d="M240 510 L285 510"/>
-  <path class="wbat" d="M351 510 L452 510 L452 410"/>
-  <path class="wgnd" d="M240 545 L538 545 L538 410"/>
+  <!-- switch -->
+  <rect x="560" y="546" width="80" height="32" rx="6" fill="#1d2530" stroke="#8a8f96" stroke-width="1.5"/>
+  <text x="600" y="567" class="pinlbl" text-anchor="middle">switch</text>
 
-  <!-- sense divider: BAT+ -> 220k -> A2 node -> 220k -> GND -->
-  <rect x="472" y="500" width="54" height="20" rx="4" class="res"/>
-  <text x="499" y="514" class="pinlbl" text-anchor="middle">220k</text>
-  <rect x="596" y="500" width="54" height="20" rx="4" class="res"/>
-  <text x="623" y="514" class="pinlbl" text-anchor="middle">220k</text>
-  <path class="wsense" d="M452 510 L472 510"/>
-  <path class="wsense" d="M526 510 L561 510 L561 470 L385 470 L385 280 L400 280"/>
-  <path class="wsense" d="M561 510 L596 510"/>
-  <path class="wgnd" d="M650 510 L672 510 L672 545 L538 545"/>
-  <text x="560" y="493" class="pinlbl" fill="#c86ac8" text-anchor="middle">midpoint → A2</text>
+  <!-- battery -->
+  <rect x="740" y="500" width="180" height="130" rx="10" class="pwr"/>
+  <text x="830" y="536" class="title" text-anchor="middle">1S LiPo</text>
+  <text x="830" y="556" class="sub" text-anchor="middle">3.7 V, protected</text>
+  <text x="830" y="600" class="sub" text-anchor="middle">verify lead polarity</text>
+  <text x="830" y="614" class="sub" text-anchor="middle">with a meter (note 5)</text>
+  <text x="754" y="558" class="pinlbl" fill="#d8b83a">+</text>
+  <text x="874" y="652" class="pinlbl" fill="#8a8f96">−</text>
+
+  <!-- divider chain on its own row: GND end .. 220k .. M .. 220k .. J1 -->
+  <rect x="250" y="458" width="60" height="24" rx="4" class="res"/>
+  <text x="280" y="474" class="pinlbl" text-anchor="middle">220k</text>
+  <rect x="370" y="458" width="60" height="24" rx="4" class="res"/>
+  <text x="400" y="474" class="pinlbl" text-anchor="middle">220k</text>
+  <path class="wgnd"   d="M250 470 L220 470"/>
+  <path class="wsense" d="M310 470 L370 470"/>
+  <path class="wbat"   d="M430 470 L452 470"/>
+  <text x="250" y="508" class="pindim">divider taps the switched +</text>
+
+  <!-- sense: midpoint M -> A2 -->
+  <path class="wsense" d="M340 470 L340 280 L400 280"/>
+  <text x="298" y="380" class="pinlbl" fill="#c86ac8">→ A2</text>
+
+  <!-- GND net (grey): one loop, R2 end -> down -> right rail -> up -> BAT- pad; LiPo − taps the rail -->
+  <path class="wgnd" d="M220 470 L220 660 L945 660 L945 436 L538 436 L538 420"/>
+  <path class="wgnd" d="M860 630 L860 660"/>
+  <text x="600" y="452" class="pindim">BAT− pad → battery −</text>
+
+  <!-- solder-joint dots -->
+  <circle cx="452" cy="470" r="4.5" class="jbat"/>   <!-- J1: divider top joins switched + -->
+  <circle cx="340" cy="470" r="4.5" class="jsen"/>   <!-- M: divider midpoint -->
+  <circle cx="860" cy="660" r="4.5" class="jgnd"/>   <!-- battery − joins GND rail -->
 
   <!-- ═══════════ fallback inset ═══════════ -->
   <rect x="700" y="130" width="256" height="238" rx="10" fill="#141014" stroke="#6a5a7a" stroke-width="1.5"/>
@@ -119,17 +138,20 @@
   <text x="712" y="347" class="sub">charge via the shield's USB.</text>
 
   <!-- ═══════════ notes ═══════════ -->
-  <text x="700" y="400" class="title" font-size="13">Notes</text>
-  <text x="700" y="422" class="note">1. Try the radar on 3V3 first. If</text>
-  <text x="700" y="438" class="note">   it tracks poorly at range, use</text>
-  <text x="700" y="454" class="note">   the 18650 shield (5 V) instead.</text>
-  <text x="700" y="476" class="note">2. Charging = USB-C into the XIAO.</text>
-  <text x="700" y="498" class="note">3. XIAO 5V pin is live on USB only</text>
-  <text x="700" y="514" class="note">   — don't power the radar from it.</text>
-  <text x="700" y="536" class="note">4. Divider drain ~9 uA. Display</text>
-  <text x="700" y="552" class="note">   shows "bat %" from the packet —</text>
-  <text x="700" y="568" class="note">   no indicator module needed.</text>
+  <text x="60" y="706" class="title" font-size="13">Notes</text>
+  <text x="60" y="728" class="note">1. Power path: LiPo + → switch → BAT+ pad. LiPo − → BAT− pad.</text>
+  <text x="60" y="744" class="note">   The pads are on the XIAO's underside — solder leads to them,</text>
+  <text x="60" y="760" class="note">   then strain-relieve with a dab of hot glue.</text>
+  <text x="60" y="782" class="note">2. Divider: switched + → 220k → M → 220k → GND, with M wired</text>
+  <text x="60" y="798" class="note">   to A2. Tap AFTER the switch so it draws nothing when off</text>
+  <text x="60" y="814" class="note">   (~9 uA when on). Equal resistors = the 2.0 ratio in firmware.</text>
+  <text x="520" y="728" class="note">3. Try the radar on 3V3 first. If it tracks poorly at</text>
+  <text x="520" y="744" class="note">   range, use the 18650 shield (inset) at 5 V instead.</text>
+  <text x="520" y="766" class="note">4. Charging = USB-C into the XIAO. The 5V pin is live</text>
+  <text x="520" y="782" class="note">   on USB only — don't power the radar from it.</text>
+  <text x="520" y="804" class="note">5. Verify LiPo lead polarity with a meter before</text>
+  <text x="520" y="820" class="note">   soldering — pigtail colors are not standardized.</text>
 
-  <text x="24" y="614" class="sub">RadarScope P4 — docs/wiring.svg · Wire colors: red=power · grey=GND · green=radar TX · blue=radar RX · yellow=battery · purple=sense</text>
-  <text x="24" y="630" class="sub">RD-03D pin order on the 1.27 mm connector varies by batch — trust the silkscreen labels, not the position.</text>
+  <text x="24" y="852" class="sub">RadarScope P4 — docs/wiring.svg · Wire colors: red=power · grey=GND · green=radar TX · blue=radar RX · yellow=battery + · purple=sense</text>
+  <text x="24" y="868" class="sub">RD-03D pin order on the 1.27 mm connector varies by batch — trust the silkscreen labels, not the position.</text>
 </svg>
